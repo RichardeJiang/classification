@@ -13,15 +13,15 @@ class ts_cluster(object):
 		self.assignments={}
 		self.centroids=[]
 
-	def knn(train,test,w):
+	def knn(self,train,test,w):
 		preds=[]
 		for ind,i in enumerate(test):
 			min_dist=float('inf')
 			closest_seq=[]
 			#print ind
 			for j in train:
-				if LB_Keogh(i[:-1],j[:-1],5)<min_dist:
-					dist=DTWDistance(i[:-1],j[:-1],w)
+				if self.LB_Keogh(i[:-1],j[:-1],5)<min_dist:
+					dist=self.DTWDistance(i[:-1],j[:-1],w)
 					if dist<min_dist:
 						min_dist=dist
 						closest_seq=j
@@ -125,7 +125,8 @@ class ts_cluster(object):
 	    
 		return np.sqrt(LB_sum)
 
-	train = np.genfromtxt('datasets/train.csv', delimiter='\t')
-	test = np.genfromtxt('datasets/test.csv', delimiter='\t')
-	print knn(train,test,4)
+foobar = ts_cluster()
+train = np.genfromtxt('datasets/train.csv', delimiter='\t')
+test = np.genfromtxt('datasets/test.csv', delimiter='\t')
+print foobar.knn(train,test,4)
 	
