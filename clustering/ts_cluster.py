@@ -27,12 +27,15 @@ class ts_cluster(object):
 						closest_seq=j
 			preds.append(closest_seq[-1])
 		return classification_report(test[:-1],preds)
-		
+	
+	'''	
 	def k_means_clust(self,data,num_iter,w,progress=False):
 		'''
+	'''
 		k-means clustering algorithm for time series data.  dynamic time warping Euclidean distance
 		 used as default similarity measure. 
 		'''
+	'''
 		self.centroids=random.sample(data,self.num_clust)
 	    
 		for n in range(num_iter):
@@ -60,7 +63,38 @@ class ts_cluster(object):
 				for k in self.assignments[key]:
 					clust_sum=clust_sum+data[k]
 				self.centroids[key]=[m/len(self.assignments[key]) for m in clust_sum]
-	        
+	'''
+	
+	def k_means_clust(self,data,num_clust,num_iter,w=5):
+		centroids=random.sample(data,num_clust)
+		counter=0;
+		for n in range(num_iter):
+			counter+=1
+			print counter
+			assignments={}
+			#assign data points to clusters
+			for ind,i in enumerate(data):
+				min_dist=float('inf')
+				closest_clust=None
+				for c_ind,j in enumerate(centroids):
+					if self.LB_Keogh(i,j,5)<min_dist:
+						cur_dist=self.DTWDistance(i,j,w)
+						if cur_dist<min_dist:
+							min_dist=cur_dist
+							closest_clust=c_ind
+				if closest_clust in assignments:
+					assignments[closest_clust].append(ind)
+				else:
+					assignments[closest_clust]=[]
+
+			#recalculate centroids of clusters
+			for key in assignments:
+				clust_sum=0;
+				for k in assignments[key]:
+					clust_sum=clust_sum+data[k]
+				centroids[key]=[m/len(assignments[key]) for m in clust_sum]
+
+		return centroids	        
 
 	def get_centroids(self):
 		return self.centroids
@@ -125,8 +159,23 @@ class ts_cluster(object):
 	    
 		return np.sqrt(LB_sum)
 
+#foobar = ts_cluster(2)
+train = np.genfromtxt('datasets/train.csv', delimiter='\t')
+test = np.genfromtxt('datasets/test.csv', delimiter='\t')
+data=np.vstack((train[:,:-1],test[:,:-1]))
+
+import matplotlib.pylab as plt
+
+#centroids=foobar.k_means_clust(data,4,10,4)
+centroids=ts_cluster(4).k_means_clust(data,4,10,4)
+for i in centroids:
+
+    plt.plot(i)
+
+plt.show()
+'''
 foobar = ts_cluster()
 train = np.genfromtxt('datasets/train.csv', delimiter='\t')
 test = np.genfromtxt('datasets/test.csv', delimiter='\t')
 print foobar.knn(train,test,4)
-	
+'''
